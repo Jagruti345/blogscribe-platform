@@ -24,8 +24,9 @@ const categoryColors: Record<string, string> = {
 };
 
 const getData = async (popular: boolean): Promise<Post[]> => {
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   try {
-    const res = await fetch(`http://localhost:3000/api/posts?popular=${popular}`, {
+    const res = await fetch(`${baseUrl}/api/posts?popular=${popular}`, {
       cache: "no-store",
     });
 

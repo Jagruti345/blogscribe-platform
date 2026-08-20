@@ -19,8 +19,9 @@ type Post = {
 };
 
 const getData = async (slug : string): Promise<Post> => {
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   const res = await fetch(
-    `http://localhost:3000/api/posts/${slug}`,
+    `${baseUrl}/api/posts/${slug}`,
     {
       cache: "no-store",
     }

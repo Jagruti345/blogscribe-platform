@@ -17,8 +17,9 @@ const colors: string[] = [
 ];
 
 const getData = async (): Promise<Category[]> => {
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   try {
-    const res = await fetch("http://localhost:3000/api/categories", {
+    const res = await fetch(`${baseUrl}/api/categories`, {
       cache: "no-store",
     });
 

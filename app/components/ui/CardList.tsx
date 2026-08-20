@@ -23,8 +23,9 @@ type PostResponse = {
 
 const getData = async (page: number, cat?: string): Promise<PostResponse> => {
   try {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
     const res = await fetch(
-      `http://localhost:3000/api/posts?page=${page}&cat=${cat || ""}`,
+      `${baseUrl}/api/posts?page=${page}&cat=${cat || ""}`,
       { cache: "no-store" }
     );
 
