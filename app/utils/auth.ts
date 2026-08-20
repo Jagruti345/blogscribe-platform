@@ -1,34 +1,91 @@
-import GithubProvider from "next-auth/providers/github"
-import GoogleProvider from "next-auth/providers/google"
-import { getServerSession, NextAuthOptions } from "next-auth"
+import GithubProvider from "next-auth/providers/github";
+import GoogleProvider from "next-auth/providers/google";
+import FacebookProvider from "next-auth/providers/facebook";
+import CredentialsProvider from "next-auth/providers/credentials";
+import { getServerSession, NextAuthOptions } from "next-auth";
+import bcrypt from "bcryptjs";
 
-import prisma from "@/lib/prisma"
-import { PrismaAdapter } from "@next-auth/prisma-adapter"
-
+import prisma from "@/lib/prisma";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
 
 export const authOptions: NextAuthOptions = {
-    adapter:PrismaAdapter(prisma),
+  adapter: PrismaAdapter(prisma),
+  session: {
+    strategy: "jwt",
+  },
+  pages: {
+    signIn: "/login",
+  },
   providers: [
+    CredentialsProvider({
+      name: "Credentials",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) {
+          throw new Error("Please enter both email and password.");
+        }
+
+        const normalizedEmail = credentials.email.toLowerCase().trim();
+
+        const user = await prisma.user.findUnique({
+          where: { email: normalizedEmail },
+        });
+
+        if (!user) {
+          throw new Error("No account found with this email address.");
+        }
+
+        if (!user.password) {
+          throw new Error(
+            "This account was created using a social sign-in (Google/GitHub/Facebook). Please sign in using your social account."
+          );
+        }
+
+        const isValidPassword = await bcrypt.compare(credentials.password, user.password);
+
+        if (!isValidPassword) {
+          throw new Error("Invalid email or password.");
+        }
+
+        return {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          image: user.image,
+        };
+      },
+    }),
     GoogleProvider({
-      clientId: process.env.GOOGLE_ID as string,
-      clientSecret: process.env.GOOGLE_SECRET as string,
+      clientId: process.env.GOOGLE_ID || "",
+      clientSecret: process.env.GOOGLE_SECRET || "",
     }),
     GithubProvider({
-      clientId: process.env.GITHUB_ID as string,
-      clientSecret: process.env.GITHUB_SECRET as string,
+      clientId: process.env.GITHUB_ID || "",
+      clientSecret: process.env.GITHUB_SECRET || "",
+    }),
+    FacebookProvider({
+      clientId: process.env.FACEBOOK_ID || "",
+      clientSecret: process.env.FACEBOOK_SECRET || "",
     }),
   ],
   secret: process.env.NEXTAUTH_SECRET,
-
   callbacks: {
-    async session({ session, user }) {
-      if (session.user) {
-        session.user.id = user.id; // ✅ ADD THIS
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (session.user && token?.id) {
+        session.user.id = token.id as string;
       }
       return session;
     },
   },
-}
+};
 
-
-export const getAuthSession = () => getServerSession(authOptions)
+export const getAuthSession = () => getServerSession(authOptions);
