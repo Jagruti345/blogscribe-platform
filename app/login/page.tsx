@@ -197,7 +197,7 @@ function LoginContent() {
             {isSignUp ? 'Create an Account' : 'Welcome Back'}
           </h1>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            {isSignUp ? 'Sign up with JWT Authentication to get started' : 'Sign in with your JWT credentials or social accounts'}
+            {isSignUp ? 'Sign up to get started' : 'Sign in with your credentials or social accounts'}
           </p>
         </div>
 
@@ -303,7 +303,7 @@ function LoginContent() {
                 {loading ? (
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                 ) : (
-                  'Sign In with JWT'
+                  'Sign In'
                 )}
               </motion.button>
             </motion.form>
@@ -383,7 +383,7 @@ function LoginContent() {
                 {loading ? (
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                 ) : (
-                  'Create Account with JWT'
+                  'Create Account'
                 )}
               </motion.button>
             </motion.form>
