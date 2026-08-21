@@ -28,13 +28,13 @@ const fetcher = async (url: string) =>{
 const Comments = ({ postSlug }: { postSlug: string }) => {
   const  {status} = useSession();
 
-  const {data,mutate, isLoading} = useSWR<Comment[]>(`${process.env.NEXT_PUBLIC_BASE_URL}/api/comments?postSlug=${postSlug}`,fetcher);
+  const { data, mutate, isLoading } = useSWR<Comment[]>(`/api/comments?postSlug=${postSlug}`, fetcher);
 
   const [desc, setDesc] = useState("");
 
   const handleSubmit = async () => {
-    try{
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/comments`,{
+    try {
+      const res = await fetch(`/api/comments`, {
         method: "POST", 
         headers: {
           "Content-Type": "application/json"

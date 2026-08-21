@@ -1,46 +1,14 @@
 import Pagination from './Pagination'
 import Card from './Card'
-
-type Post = {
-  id: string;
-  title: string;
-  desc: string;
-  img?: string;
-  createdAt: string;
-  slug: string;
-  catSlug: string;
-};
+import { getPosts } from '@/lib/data'
 
 type CardListProps = {
   page: number;
   cat?: string;
 };
 
-type PostResponse = {
-  posts: Post[];
-  count: number;
-};
-
-const getData = async (page: number, cat?: string): Promise<PostResponse> => {
-  try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-    const res = await fetch(
-      `${baseUrl}/api/posts?page=${page}&cat=${cat || ""}`,
-      { cache: "no-store" }
-    );
-
-    if (!res.ok) {
-      return { posts: [], count: 0 };
-    }
-
-    return res.json();
-  } catch (error) {
-    return { posts: [], count: 0 };
-  }
-};
-
 const CardList = async ({ page, cat }: CardListProps) => {
-  const { posts, count } = await getData(page, cat);
+  const { posts, count } = await getPosts(page, cat);
 
   const POST_PER_PAGE = 2;
 
@@ -49,22 +17,20 @@ const CardList = async ({ page, cat }: CardListProps) => {
 
   return (
     <div className="w-full max-w-5xl mx-auto px-4 overflow-x-hidden mb-20">
-  
-  <h1 className="my-10 font-extrabold text-2xl md:text-3xl lg:text-4xl tracking-tight">
-    Recent Posts
-  </h1>
+      <h1 className="my-10 font-extrabold text-2xl md:text-3xl lg:text-4xl tracking-tight">
+        Recent Posts
+      </h1>
 
-  <div className="flex flex-col gap-10">
-    {posts?.map((item, index) => (
-      <Card item={item} key={item.id} index={index} />
-    ))}
-  </div>
+      <div className="flex flex-col gap-10">
+        {posts?.map((item: any, index: number) => (
+          <Card item={item} key={item.id} index={index} />
+        ))}
+      </div>
 
-  <div className="mt-14">
-    <Pagination page={page} hasPrev={hasPrev} hasNext={hasNext} />
-  </div>
-
-</div>
+      <div className="mt-14">
+        <Pagination page={page} hasPrev={hasPrev} hasNext={hasNext} />
+      </div>
+    </div>
   );
 };
 

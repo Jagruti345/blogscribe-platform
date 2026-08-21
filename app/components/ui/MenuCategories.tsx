@@ -1,11 +1,5 @@
 import Link from 'next/link'
-
-type Category = {
-  id: string;
-  slug: string;
-  title: string;
-  img?: string;
-};
+import { getCategories } from '@/lib/data';
 
 const colors: string[] = [
   "bg-blue-100 dark:bg-blue-900/40 border border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-300",
@@ -16,25 +10,8 @@ const colors: string[] = [
   "bg-gray-100 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-300",
 ];
 
-const getData = async (): Promise<Category[]> => {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-  try {
-    const res = await fetch(`${baseUrl}/api/categories`, {
-      cache: "no-store",
-    });
-
-    if (!res.ok) {
-      return [];
-    }
-
-    return res.json();
-  } catch (error) {
-    return [];
-  }
-};
-
 const MenuCategories = async () => {
-  const data = await getData();
+  const data = await getCategories();
   
   if (!data || data.length === 0) {
     return null;

@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
-
+import { getCategories } from '@/lib/data'
 
 const colors: string[] = [
   "bg-blue-100 dark:bg-blue-900/40 border border-blue-200 dark:border-blue-800",
@@ -11,56 +11,31 @@ const colors: string[] = [
   "bg-gray-100 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700",
 ];
 
-type Category = {
-  id: string;
-  slug: string;
-  title: string;
-  img?: string;
-};
-
-const getData = async (): Promise<Category[]> =>{
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-  try {
-    const res = await fetch(`${baseUrl}/api/categories`,{
-      cache: "no-store",
-    });
-
-    if(!res.ok){
-      return [];
-    }
-
-    return res.json();
-  } catch (error) {
-    return [];
-  }
-}
-
 const CategoryList = async () => {
-
-  const data = await getData();
+  const data = await getCategories();
 
   return (
     <div className='mt-10 mb-16'>
       <h1 className='my-10 font-extrabold text-2xl md:text-3xl lg:text-4xl tracking-tight'>Popular Categories</h1>
       <div className='flex flex-wrap justify-center lg:justify-between gap-4'>
         {data?.map((item, index) => (
-  <Link
-    href={`/blog?cat=${item.slug}`}
-    key={item.id}
-    className={`flex h-16 w-full lg:w-48 md:w-48 rounded-xl justify-center items-center gap-3 transition-all duration-300 hover:scale-105 hover:shadow-lg ${colors[index % colors.length]}`}
-  >
-    {item.img && (
-      <Image
-      src={item.img}
-      alt={item.title}
-      width={32}
-      height={32}
-      className="w-8 h-8 object-cover rounded-full shadow-sm"
-    />)
-}
-    <span className="font-bold text-sm tracking-wider">{item.title.toUpperCase()}</span>
-  </Link>
-))}
+          <Link
+            href={`/blog?cat=${item.slug}`}
+            key={item.id}
+            className={`flex h-16 w-full lg:w-48 md:w-48 rounded-xl justify-center items-center gap-3 transition-all duration-300 hover:scale-105 hover:shadow-lg ${colors[index % colors.length]}`}
+          >
+            {item.img && (
+              <Image
+                src={item.img}
+                alt={item.title}
+                width={32}
+                height={32}
+                className="w-8 h-8 object-cover rounded-full shadow-sm"
+              />
+            )}
+            <span className="font-bold text-sm tracking-wider">{item.title.toUpperCase()}</span>
+          </Link>
+        ))}
       </div>
     </div>
   )
